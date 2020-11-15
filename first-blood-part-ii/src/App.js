@@ -1,7 +1,7 @@
 import React, { useState, useEffect }  from 'react';
 import './App.css';
 import API from './api';
-
+import CanvasComponent from './CanvasComponent'
 const trace = console.log;
 
 const locations = [
@@ -123,12 +123,12 @@ function App() {
     };
 
     return (
-	<div className="App" style={state.style}
+	<div className="App"
 	     onTouchEnd={e => touchEndEventHandler(e)}
 	     onMouseUp={() => mouseUpEventHandler()}
 	>
 	    <div className="App-header">
-		{state.frameTime ? "" : "Loading parking view..."}
+                <CanvasComponent/>
 	    </div>
 	</div>
     );
