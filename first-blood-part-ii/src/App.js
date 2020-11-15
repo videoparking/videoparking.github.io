@@ -6,7 +6,7 @@ const trace = console.log;
 
 const locations = [
     "a07345b2737af5f/1",
-    "mGu3HwPpxwQSx/1",
+    "8f38301f7f70d7d1/1",
 ]
 
 var currentLocation = 0;
