@@ -1,22 +1,20 @@
 import React, { useState, useEffect }  from 'react';
 import './App.css';
 import API from './api';
-import CanvasComponent from './CanvasComponent'
+import URLImage from './URLImage'
+import PreviewZonesComponent from './PreviewZonesComponent'
+import PreviewDetectionsComponent from './PreviewDetectionsComponent'
+import {Layer, Stage} from 'react-konva';
+
 const trace = console.log;
 
 const locations = [
-    "a07345b2737af5f/1",
     "8f38301f7f70d7d1/1",
+    "a07345b2737af5f/1",
 ]
 
-var currentLocation = 0;
-
-function location() {
-    return locations[currentLocation];
-}
-
-async function getPicData() {
-    const response = await API.get(`view?location=${location()}`);
+async function getPicData(location) {
+    const response = await API.get(`view?location=${location}`);
     console.log("response:", response);
     return response.data;
 
@@ -28,10 +26,22 @@ async function getPicData() {
     // });
 }
 
+function calc_vw() {
+    return Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+}
+
+function calc_vh() {
+    return Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+}
+
 function App() {
     const [state, setState] = useState({
 	picSrc: undefined,
 	firstPic: true,
+        location: locations[0],
+        vw: calc_vw(),
+        vh: calc_vh(),
+        scale: 0.25,
     });
 
     const makeStyle = (url, frameTime) => {
@@ -68,20 +78,25 @@ function App() {
     };
 
     const refreshPic = () => {
-	getPicData().then(data => {
+	getPicData(state.location).then(data => {
 	    trace(data);
 	    const duration = (data.duration ? data.duration : 60);
             const url = data.url;
             const frameTime = data.frameTime;
             const style = makeStyle(url, frameTime);
+            //console.log(">>>>>", url);
 	    setState({
 		picSrc: url,
 		firstPic: false,
 		duration: duration,
                 frameTime: frameTime,
                 style: style,
+                location: state.location,
+                vw: calc_vw(),
+                vh: calc_vh(),
+                scale: 0.25,
 	    });
-	    document.title = data.message + `, parking at ${location()} ${new Date(frameTime)}`;
+	    document.title = data.message + `, parking at ${state.location} ${new Date(frameTime)}`;
 	}).catch(err => {
             console.log(err);
 	    const duration = 30;
@@ -94,6 +109,10 @@ function App() {
                 frameTime: state.frameTime,
                 style: style,
                 retries: retries,
+                location: state.location,
+                vw: calc_vw(),
+                vh: calc_vh(),
+                scale: 0.25,
 	    });
 	    document.title = `Retrying (${retries})` + (state.frameTime ? ` from ${state.frameTime} ...` : '...');
         });
@@ -108,9 +127,14 @@ function App() {
     });
 
     const setNextLocation = () => {
-	currentLocation = (currentLocation + 1) % locations.length;
-	console.log("location:", location());
-
+	const current = locations.indexOf(state.location);
+        const next = (current + 1) % locations.length;
+        const location = locations[next];
+	console.log("location:", location);
+	setState({
+	    firstPic: true,
+            location: location,
+	});
 	refreshPic();
     };
 
@@ -128,7 +152,31 @@ function App() {
 	     onMouseUp={() => mouseUpEventHandler()}
 	>
 	    <div className="App-header">
-                <CanvasComponent/>
+                <Stage
+                    width={state.vw}
+                    height={state.vh}
+                >
+                    <Layer>
+                        <URLImage
+                            src={state.picSrc}
+                            scale={state.scale}
+                        />
+                    </Layer>
+                    <Layer>
+                        <PreviewZonesComponent
+                            location={state.location}
+                            scale={state.scale}
+                            color="magenta"
+                        />
+                    </Layer>
+                    <Layer>
+                        <PreviewDetectionsComponent
+                            detections={state.detections}
+                            scale={state.scale}
+                            color="blue"
+                        />
+                    </Layer>
+                </Stage>
 	    </div>
 	</div>
     );
