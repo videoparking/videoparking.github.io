@@ -1,39 +1,25 @@
 import React from 'react';
 import {Rect, Text, Group} from 'react-konva';
 
-const detections_sample = [
-    {
-        "zone": "a",
-        "bbox": [1310, 324, 376, 309],
-        "att_y": "1300",
-        "att_x": "0",
-        "location": "8f38301f7f70d7d1",
-        "camera": "1",
-        "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
-        "object": "car",
-        "measure_value::double": "0.7678198218345642",
-        "measure_name": "confidence",
-        "time": "2020-11-16 00:38:00.000000000"
-    },
-    {
-        "zone": "a",
-        "bbox": [2115, 265, 379, 269],
-        "att_y": "1300",
-        "att_x": "0",
-        "location": "8f38301f7f70d7d1",
-        "camera": "1",
-        "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
-        "object": "car",
-        "measure_value::double": "0.7678198218342",
-        "measure_name": "confidence",
-        "time": "2020-11-16 00:38:00.000000000"
-    },    
-];
 
 class PreviewDetectionsComponent extends React.Component {
     state = {
-        detections: detections_sample.map((e) => this.norm(e)),
+        detections: this.props.detections.map((e) => this.norm(e)),
     };
+    componentDidMount() {
+        //
+    }
+    componentDidUpdate(oldProps) {
+        if (oldProps.detections !== this.props.detections) {
+            const normed = this.props.detections.map((e) => this.norm(e))
+            this.setState({
+                detections: normed
+            });
+        }
+    }
+    componentWillUnmount() {
+        //
+    }
     norm(d) {
         const dn = {
             "object": d.object,

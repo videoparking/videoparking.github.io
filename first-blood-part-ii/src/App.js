@@ -13,6 +13,36 @@ const locations = [
     "a07345b2737af5f/1",
 ]
 
+const detections_sample = [
+    {
+        "zone": "a",
+        "bbox": [1310, 324, 376, 309],
+        "att_y": "1300",
+        "att_x": "0",
+        "location": "8f38301f7f70d7d1",
+        "camera": "1",
+        "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
+        "object": "car",
+        "measure_value::double": "0.7678198218345642",
+        "measure_name": "confidence",
+        "time": "2020-11-16 00:38:00.000000000"
+    },
+    {
+        "zone": "a",
+        "bbox": [2115, 265, 379, 269],
+        "att_y": "1300",
+        "att_x": "0",
+        "location": "8f38301f7f70d7d1",
+        "camera": "1",
+        "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
+        "object": "car",
+        "measure_value::double": "0.7678198218342",
+        "measure_name": "confidence",
+        "time": "2020-11-16 00:38:00.000000000"
+    },    
+];
+
+
 async function getPicData(location) {
     const response = await API.get(`view?location=${location}`);
     console.log("response:", response);
@@ -42,6 +72,7 @@ function App() {
         vw: calc_vw(),
         vh: calc_vh(),
         scale: 0.25,
+        detections: [],
     });
 
     const makeStyle = (url, frameTime) => {
@@ -85,17 +116,19 @@ function App() {
             const frameTime = data.frameTime;
             const style = makeStyle(url, frameTime);
             //console.log(">>>>>", url);
-	    setState({
+            const newState = {
+                ...state,
 		picSrc: url,
 		firstPic: false,
 		duration: duration,
                 frameTime: frameTime,
                 style: style,
-                location: state.location,
                 vw: calc_vw(),
                 vh: calc_vh(),
-                scale: 0.25,
-	    });
+                detections: detections_sample,
+	    }
+            console.log(newState);
+	    setState(newState);
 	    document.title = data.message + `, parking at ${state.location} ${new Date(frameTime)}`;
 	}).catch(err => {
             console.log(err);
@@ -106,13 +139,11 @@ function App() {
 		picSrc: state.picSrc,
 		firstPic: false,
 		duration: duration,
-                frameTime: state.frameTime,
                 style: style,
                 retries: retries,
-                location: state.location,
                 vw: calc_vw(),
                 vh: calc_vh(),
-                scale: 0.25,
+                detections: [],
 	    });
 	    document.title = `Retrying (${retries})` + (state.frameTime ? ` from ${state.frameTime} ...` : '...');
         });
@@ -134,6 +165,9 @@ function App() {
 	setState({
 	    firstPic: true,
             location: location,
+            vw: calc_vw(),
+            vh: calc_vh(),
+            detections: [],
 	});
 	refreshPic();
     };
@@ -173,7 +207,7 @@ function App() {
                         <PreviewDetectionsComponent
                             detections={state.detections}
                             scale={state.scale}
-                            color="blue"
+                            color="yellow"
                         />
                     </Layer>
                 </Stage>
