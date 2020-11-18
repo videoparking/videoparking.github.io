@@ -4,7 +4,8 @@ import API from './api';
 import URLImage from './URLImage'
 import PreviewZonesComponent from './PreviewZonesComponent'
 import PreviewDetectionsComponent from './PreviewDetectionsComponent'
-import {Layer, Stage} from 'react-konva';
+import {Layer, Stage, Text, Group} from 'react-konva';
+import { useDoubleTap } from 'use-double-tap';
 
 const trace = console.log;
 
@@ -136,6 +137,7 @@ function App() {
             const style = makeStyle(state.picSrc, state.frameTime);
             const retries = state.retries ? (state.retries + 1) : 0;
 	    setState({
+                ...state,
 		picSrc: state.picSrc,
 		firstPic: false,
 		duration: duration,
@@ -163,32 +165,30 @@ function App() {
         const location = locations[next];
 	console.log("location:", location);
 	setState({
+            ...state,
 	    firstPic: true,
             location: location,
             vw: calc_vw(),
             vh: calc_vh(),
-            detections: [],
 	});
-	refreshPic();
+	//refreshPic();
     };
 
-    const touchEndEventHandler = (event) => {
-	setNextLocation();
-    };
-
-    const mouseUpEventHandler = (event) => {
-	setNextLocation();
-    };
+    const bind = useDoubleTap((event) => {
+        // Your action here
+        setNextLocation();
+        console.log('Double tapped');
+    });
 
     return (
 	<div className="App"
-	     onTouchEnd={e => touchEndEventHandler(e)}
-	     onMouseUp={() => mouseUpEventHandler()}
+             {...bind}
 	>
 	    <div className="App-header">
                 <Stage
                     width={state.vw}
                     height={state.vh}
+                    style={{backgroundColor:'dimgray'}}
                 >
                     <Layer>
                         <URLImage
@@ -210,6 +210,34 @@ function App() {
                             color="yellow"
                         />
                     </Layer>
+                    <Layer>
+                        <Group
+                            x={state.vw - 180}
+                            y={3}
+                        >
+                            <Text
+                                text={`Info:
+  location: ${state.location}
+  screen: ${state.vw}x${state.vh}
+  scale: ${state.scale}
+`}
+                                fontSize={10}
+                                fill={"lawngreen"}
+                            />
+                        </Group>
+                        <Group
+                            x={state.vw - 180}
+                            y={state.vh - 30}
+                        >
+                            <Text
+                                text={`Help:
+  - Double-tap to select next location
+`}
+                                fontSize={10}
+                                fill={"black"}
+                            />
+                        </Group>
+                    </Layer>                
                 </Stage>
 	    </div>
 	</div>

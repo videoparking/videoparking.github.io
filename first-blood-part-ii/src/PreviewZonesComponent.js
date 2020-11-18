@@ -32,7 +32,7 @@ class PreviewZonesComponent extends React.Component {
                 zones: data.zones,
             });
         }).catch(err => {
-            console.log(err);
+            console.log("ERROR:",err);
             this.setState({
                 zones: [],
             });
