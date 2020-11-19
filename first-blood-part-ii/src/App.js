@@ -17,27 +17,33 @@ const locations = [
 const detections_sample = [
     {
         "zone": "a",
-        "bbox": [1310, 324, 376, 309],
+        "bbox_w": "376",
+        "bbox_h": "309",
+        "bbox_x": "1310",
+        "bbox_y": "324",
         "att_y": "1300",
         "att_x": "0",
         "location": "8f38301f7f70d7d1",
         "camera": "1",
         "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
         "object": "car",
-        "measure_value::double": "0.7678198218345642",
+        "measure_value": 0.7678198218345642,
         "measure_name": "confidence",
         "time": "2020-11-16 00:38:00.000000000"
     },
     {
         "zone": "a",
-        "bbox": [2115, 265, 379, 269],
+        "bbox_w": "379",
+        "bbox_h": "269",
+        "bbox_x": "2115",
+        "bbox_y": "265",
         "att_y": "1300",
         "att_x": "0",
         "location": "8f38301f7f70d7d1",
         "camera": "1",
         "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
         "object": "car",
-        "measure_value::double": "0.7678198218342",
+        "measure_value": 0.7678198218342,
         "measure_name": "confidence",
         "time": "2020-11-16 00:38:00.000000000"
     },    
@@ -126,7 +132,7 @@ function App() {
                 style: style,
                 vw: calc_vw(),
                 vh: calc_vh(),
-                detections: detections_sample,
+                detections: data.detections || [],
 	    }
             console.log(newState);
 	    setState(newState);
@@ -212,14 +218,16 @@ function App() {
                     </Layer>
                     <Layer>
                         <Group
-                            x={state.vw - 180}
+                            x={state.vw - 200}
                             y={3}
                         >
                             <Text
                                 text={`Info:
-  location: ${state.location}
   screen: ${state.vw}x${state.vh}
   scale: ${state.scale}
+  location: ${state.location}
+  frame time: ${state.frameTime}
+  detections: ${state.detections.length}
 `}
                                 fontSize={10}
                                 fill={"lawngreen"}

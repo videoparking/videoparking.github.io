@@ -23,12 +23,12 @@ class PreviewDetectionsComponent extends React.Component {
     norm(d) {
         const dn = {
             "object": d.object,
-            "confidence": parseFloat(d["measure_value::double"]),
+            "confidence": parseFloat(d["measure_value"]),
             "bbox": {
-                "x": parseInt(d.att_x) + parseInt(d.bbox[0]) - parseInt(d.bbox[2])/2,
-                "y": parseInt(d.att_y) + parseInt(d.bbox[1]) - parseInt(d.bbox[3])/2,
-                "width": parseInt(d.bbox[2]),
-                "height": parseInt(d.bbox[3]),
+                "x": parseInt(d.att_x) + parseInt(d.bbox_x) - parseInt(d.bbox_w)/2,
+                "y": parseInt(d.att_y) + parseInt(d.bbox_y) - parseInt(d.bbox_h)/2,
+                "width": parseInt(d.bbox_w),
+                "height": parseInt(d.bbox_h),
             },
         };
         return (dn);
