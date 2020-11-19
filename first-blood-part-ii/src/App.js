@@ -80,6 +80,7 @@ function App() {
         vh: calc_vh(),
         scale: 0.25,
         detections: [],
+        stats: [],
     });
 
     const makeStyle = (url, frameTime) => {
@@ -133,6 +134,7 @@ function App() {
                 vw: calc_vw(),
                 vh: calc_vh(),
                 detections: data.detections || [],
+                stats: data.stats || [],
 	    }
             console.log(newState);
 	    setState(newState);
@@ -152,6 +154,7 @@ function App() {
                 vw: calc_vw(),
                 vh: calc_vh(),
                 detections: [],
+                stats: [],
 	    });
 	    document.title = `Retrying (${retries})` + (state.frameTime ? ` from ${state.frameTime} ...` : '...');
         });
@@ -205,6 +208,7 @@ function App() {
                     <Layer>
                         <PreviewZonesComponent
                             location={state.location}
+                            stats={state.stats}
                             scale={state.scale}
                             color="magenta"
                         />

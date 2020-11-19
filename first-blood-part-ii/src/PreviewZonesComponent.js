@@ -10,9 +10,18 @@ async function getZonesData(location) {
     return response.data;
 }
 
+function norm(stats) {
+    const s = {};
+    stats.map(e =>
+        s[e.zone] = e
+    );
+    return s;
+}
+
 class PreviewZonesComponent extends React.Component {
     state = {
         zones: [],
+        stats: norm(this.props.stats),
     };
     componentDidMount() {
         this.loadZones();
@@ -20,6 +29,11 @@ class PreviewZonesComponent extends React.Component {
     componentDidUpdate(oldProps) {
         if (oldProps.location !== this.props.location) {
             this.loadZones();
+        } else if (oldProps.stats !== this.props.stats) {
+            this.setState({
+                ...this.state,
+                stats: norm(this.props.stats),
+            });
         }
     }
     componentWillUnmount() {
@@ -30,6 +44,7 @@ class PreviewZonesComponent extends React.Component {
             trace(data);
             this.setState({
                 zones: data.zones,
+                stats: norm(this.props.stats),
             });
         }).catch(err => {
             console.log("ERROR:",err);
@@ -57,6 +72,16 @@ class PreviewZonesComponent extends React.Component {
         }
         return func;
     }
+    info(name) {
+        if (this.state.stats) {
+            const stats = this.state.stats[name];
+            if (stats) {
+                return `${name} ${stats.last_detected_cars}/${stats.max_detected_cars}`;
+            } else {
+                return name;
+            }
+        }
+    }
     render() {
         return (
             this.state.zones.map((zone) =>
@@ -66,7 +91,7 @@ class PreviewZonesComponent extends React.Component {
                     y={0}
                 >
                     <Text
-                        text={zone.name}
+                        text={this.info(zone.name)}
                         x={3 + zone.polygon[0][0] * this.props.scale}
                         y={zone.polygon[0][1] * this.props.scale}
                         fontSize={10}
