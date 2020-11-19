@@ -14,40 +14,40 @@ const locations = [
     "a07345b2737af5f/1",
 ]
 
-const detections_sample = [
-    {
-        "zone": "a",
-        "bbox_w": "376",
-        "bbox_h": "309",
-        "bbox_x": "1310",
-        "bbox_y": "324",
-        "att_y": "1300",
-        "att_x": "0",
-        "location": "8f38301f7f70d7d1",
-        "camera": "1",
-        "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
-        "object": "car",
-        "measure_value": 0.7678198218345642,
-        "measure_name": "confidence",
-        "time": "2020-11-16 00:38:00.000000000"
-    },
-    {
-        "zone": "a",
-        "bbox_w": "379",
-        "bbox_h": "269",
-        "bbox_x": "2115",
-        "bbox_y": "265",
-        "att_y": "1300",
-        "att_x": "0",
-        "location": "8f38301f7f70d7d1",
-        "camera": "1",
-        "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
-        "object": "car",
-        "measure_value": 0.7678198218342,
-        "measure_name": "confidence",
-        "time": "2020-11-16 00:38:00.000000000"
-    },    
-];
+// const detections_sample = [
+//     {
+//         "zone": "a",
+//         "bbox_w": "376",
+//         "bbox_h": "309",
+//         "bbox_x": "1310",
+//         "bbox_y": "324",
+//         "att_y": "1300",
+//         "att_x": "0",
+//         "location": "8f38301f7f70d7d1",
+//         "camera": "1",
+//         "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
+//         "object": "car",
+//         "measure_value": 0.7678198218345642,
+//         "measure_name": "confidence",
+//         "time": "2020-11-16 00:38:00.000000000"
+//     },
+//     {
+//         "zone": "a",
+//         "bbox_w": "379",
+//         "bbox_h": "269",
+//         "bbox_x": "2115",
+//         "bbox_y": "265",
+//         "att_y": "1300",
+//         "att_x": "0",
+//         "location": "8f38301f7f70d7d1",
+//         "camera": "1",
+//         "detector_hostname": "videoparking-detector-67cf67cd55-8kmll",
+//         "object": "car",
+//         "measure_value": 0.7678198218342,
+//         "measure_name": "confidence",
+//         "time": "2020-11-16 00:38:00.000000000"
+//     },    
+// ];
 
 
 async function getPicData(location) {
@@ -232,7 +232,9 @@ function App() {
   location: ${state.location}
   frame time: ${state.frameTime}
   detections: ${state.detections.length}
-`}
+  zones:
+    ` + state.stats.map(stats => `${stats.zone}: ${stats.last_detected_cars}/${stats.max_detected_cars} [max of ${stats.period_for_max}]`).join(`
+    `)}
                                 fontSize={10}
                                 fill={"lawngreen"}
                             />
