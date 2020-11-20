@@ -71,6 +71,16 @@ function calc_vh() {
     return Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 }
 
+function calc_scale(vw, vh, iw, ih) {
+    if (vw && vh && iw && ih) {
+        const scale_by_w = vw/iw;
+        const scale_by_h = vh/ih;
+        return Math.min(scale_by_w, scale_by_h);
+    } else {
+        return 0.25;
+    }
+}
+
 function App() {
     const [state, setState] = useState({
 	picSrc: undefined,
@@ -78,7 +88,7 @@ function App() {
         location: locations[0],
         vw: calc_vw(),
         vh: calc_vh(),
-        scale: 0.25,
+        scale: calc_scale(calc_vw(), calc_vh()),
         detections: [],
         stats: [],
     });
@@ -131,12 +141,9 @@ function App() {
 		duration: duration,
                 frameTime: frameTime,
                 style: style,
-                vw: calc_vw(),
-                vh: calc_vh(),
                 detections: data.detections || [],
                 stats: data.stats || [],
 	    }
-            console.log(newState);
 	    setState(newState);
 	    document.title = data.message + `, parking at ${state.location} ${new Date(frameTime)}`;
 	}).catch(err => {
@@ -151,8 +158,6 @@ function App() {
 		duration: duration,
                 style: style,
                 retries: retries,
-                vw: calc_vw(),
-                vh: calc_vh(),
                 detections: [],
                 stats: [],
 	    });
@@ -177,11 +182,34 @@ function App() {
             ...state,
 	    firstPic: true,
             location: location,
-            vw: calc_vw(),
-            vh: calc_vh(),
 	});
 	//refreshPic();
     };
+
+    const updateImageSize = (im) => {
+        const vw = calc_vw();
+        const vh = calc_vh();
+        const iw = im ? im.width : state.iw;
+        const ih = im ? im.height : state.ih;
+        const scale = calc_scale(vw,vh,iw,ih);
+        if (iw !== state.iw || ih !== state.ih ||
+            vw !== state.vw || vh !== state.vh ||
+            scale !== state.scale
+           ) {
+            const changes = {
+                vw: vw,
+                vh: vh,
+                iw: iw,
+                ih: ih,
+                scale: scale,
+            };
+            console.log("[!] New state changes:", changes);
+            setState({
+                ...state,
+                ...changes,
+	    });
+        }
+    }
 
     const bind = useDoubleTap((event) => {
         // Your action here
@@ -203,6 +231,7 @@ function App() {
                         <URLImage
                             src={state.picSrc}
                             scale={state.scale}
+                            onLoadImage={(i) => updateImageSize(i)}
                         />
                     </Layer>
                     <Layer>
@@ -236,7 +265,7 @@ function App() {
     ` + state.stats.map(stats => `${stats.zone}: ${stats.last_detected_cars}/${stats.max_detected_cars} [max of ${stats.period_for_max}]`).join(`
     `)}
                                 fontSize={10}
-                                fill={"lawngreen"}
+                                fill={"magenta"}
                             />
                         </Group>
                         <Group

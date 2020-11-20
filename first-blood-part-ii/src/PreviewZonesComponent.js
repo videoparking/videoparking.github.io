@@ -1,13 +1,17 @@
 import React from 'react';
-import {Konva, Shape, Group, Text} from 'react-konva';
+import {Shape, Group, Text} from 'react-konva';
 import API from './zonesApi';
 
 const trace = console.log;
 
 async function getZonesData(location) {
-    const response = await API.get(`${location}/zones-v1.json`);
-    console.log("response:", response);
-    return response.data;
+    if (location) {
+        const response = await API.get(`${location}/zones-v1.json`);
+        console.log("response:", response);
+        return response.data;
+    } else {
+        return undefined;
+    }
 }
 
 function norm(stats) {

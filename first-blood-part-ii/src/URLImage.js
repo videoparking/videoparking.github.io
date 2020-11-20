@@ -1,5 +1,5 @@
 import React from 'react';
-import {Konva, Image, Text} from 'react-konva';
+import {Image, Text} from 'react-konva';
 
 // custom component that will handle loading image from url
 // you may add more logic here to handle "loading" state
@@ -40,6 +40,9 @@ class URLImage extends React.Component {
         // if you keep same image object during source updates
         // you will have to update layer manually:
         // this.imageNode.getLayer().batchDraw();
+        if (this.props.onLoadImage) {
+            this.props.onLoadImage(this.image);
+        }
     };
     handleError = (err) => {
         this.setState({
@@ -47,7 +50,7 @@ class URLImage extends React.Component {
         });
     };
     render() {
-        if (this.state.error != undefined) {
+        if (this.state.error !== undefined) {
             return (
                 <Text
                     text={this.state.error}
