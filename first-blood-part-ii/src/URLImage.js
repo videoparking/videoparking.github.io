@@ -24,11 +24,15 @@ class URLImage extends React.Component {
         this.image.removeEventListener('load', this.handleLoad);
     }
     loadImage() {
-        // save to "this" to remove "load" handler on unmount
-        this.image = new window.Image();
-        this.image.src = this.props.src;
-        this.image.addEventListener('load', this.handleLoad);
-        this.image.addEventListener('error', this.handleError);
+        if (this.props.src) {
+            // save to "this" to remove "load" handler on unmount
+            this.image = new window.Image();
+            this.image.src = this.props.src;
+            this.image.addEventListener('load', this.handleLoad);
+            this.image.addEventListener('error', this.handleError);
+        } else {
+            this.image = undefined;
+        }
     }
     handleLoad = () => {
         // after setState react-konva will update canvas and redraw the layer
