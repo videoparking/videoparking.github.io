@@ -51,13 +51,13 @@ const locations = [
 
 
 async function getPicData(location) {
-    const response = await API.get(`view?location=${location}`);
+    const response = await API.get(`view?location=${location}&image=yes&detections=yes`);
     console.log("response:", response);
     return response.data;
 
     // return new Promise( (resolutionFunc,rejectionFunc) => {
     // 		resolutionFunc({
-    // 				url: "https://www.ima-home.be/layout/uploads/2020/06/ima-slide1.jpg",
+    // 				image: { url: "https://www.ima-home.be/layout/uploads/2020/06/ima-slide1.jpg" },
     // 				message: "xxxxx",
     // 		});
     // });
@@ -130,7 +130,7 @@ function App() {
 	getPicData(state.location).then(data => {
 	    trace(data);
 	    const duration = (data.duration ? data.duration : 60);
-            const url = data.url;
+            const url = data.image.url;
             const frameTime = data.frameTime;
             const style = makeStyle(url, frameTime);
             //console.log(">>>>>", url);
