@@ -1,0 +1,22 @@
+.MapView {
+  text-align: center;
+}
+
+.MapView-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.MapView-link {
+  color: #61dafb;
+}
+
+
+.leaflet-container {
+    height: 100vh;
+}

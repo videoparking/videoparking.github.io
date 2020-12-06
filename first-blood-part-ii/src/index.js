@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-//import App from './App';
-import MapApp from './MapApp';
+import App from './App';
+//import MapApp from './MapApp';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
-    <MapApp />
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );

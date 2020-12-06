@@ -1,8 +1,8 @@
-.MapApp {
+.CamView {
   text-align: center;
 }
 
-.MapApp-header {
+.CamView-header {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -12,11 +12,6 @@
   color: white;
 }
 
-.MapApp-link {
+.CamView-link {
   color: #61dafb;
-}
-
-
-.leaflet-container {
-    height: 100vh;
 }

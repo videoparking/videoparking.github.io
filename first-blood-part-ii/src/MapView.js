@@ -1,6 +1,7 @@
 import 'leaflet/dist/leaflet.css';
 import React, { useState, useEffect }  from 'react';
-import './MapApp.css';
+import { Link, useParams } from 'react-router-dom';
+import './MapView.css';
 import API from './api';
 import { MapContainer, TileLayer, Polygon, Tooltip, Marker, Popup, useMapEvents } from 'react-leaflet';
 
@@ -46,6 +47,10 @@ const locations = {
 }
 
 async function getStats(location) {
+    if (!location) {
+        return;
+    }
+    
     const response = await API.get(`view?location=${location}`);
     console.log("response:", response);
     return response.data;
@@ -91,29 +96,43 @@ async function getStats(location) {
 }
 
 
-function MapApp() {
+function MapView() {
 
     const [state, setState] = useState({
         stats: [],
-        location: "8f38301f7f70d7d1/1",
 	first: true,
+        location: "8f38301f7f70d7d1/1", // TODO: Add location(s) detection for visible area at lat lon
     });
+
+    const { latLng } = useParams();
+
+    if (latLng && latLng !== state.latLng) {
+        const pos = latLng.split(",").map(parseFloat);
+        console.log("pos:", pos);
+        setState({
+            ...state,
+            latLng: latLng,
+            pos: pos,
+        });
+    }
 
     const refreshStats = () => {
 	getStats(state.location).then(data => {
-	    trace(data);
-	    const duration = (data.duration ? data.duration : 60);
-            const frameTime = data.frameTime;
-            const newS = {
-                ...state,
-		first: false,
-		duration: duration,
-                frameTime: frameTime,
-                stats: data.stats || [],
-	    };
-            console.log(newS);
-	    setState(newS);
-	    document.title = data.message + `, parking at ${state.location} ${new Date(frameTime)}`;
+            if (data) {
+	        trace(data);
+	        const duration = (data.duration ? data.duration : 60);
+                const frameTime = data.frameTime;
+                const newS = {
+                    ...state,
+		    first: false,
+		    duration: duration,
+                    frameTime: frameTime,
+                    stats: data.stats || [],
+	        };
+                console.log(newS);
+	        setState(newS);
+	        document.title = data.message + `, parking at ${state.location} ${new Date(frameTime)}`;
+            }
 	}).catch(err => {
             console.log(err);
 	    const duration = 30;
@@ -134,7 +153,10 @@ function MapApp() {
 	console.log('Timeout till renew:', renewInterval);
 	const timer = setTimeout(refreshStats, renewInterval*1000);
 	// Clear timeout if the component is unmounted
-	return () => clearTimeout(timer);
+	return () => {
+            console.log("Stopping renewal of MapView");
+            clearTimeout(timer);
+        };
     });
 
     const startLocation = locations["8f38301f7f70d7d1/1"];
@@ -161,7 +183,6 @@ function MapApp() {
     */
 
     const Zones = (stats) => {
-        const loc = startLocation;
         return (
             stats.map((s) => {
                 const locationId = s["location"]+"/"+s["camera"];
@@ -177,10 +198,10 @@ function MapApp() {
                         const lastCars = parseInt(s["last_detected_cars"]);
                         const cap = lastCars/maxCars;
                         trace(cap);
-                        var pathOptions = { fillColor: 'blue' };
-                        if (cap < 0.5) { pathOptions = { fillColor: 'green' } }
-                        else if (cap < 0.8) { pathOptions = { fillColor: 'red' } }
-                        else if (cap < 1.1) { pathOptions = { fillColor: 'black' } }
+                        var pathOptions = { fillColor: 'blue', color: 'blue' };
+                        if (cap < 0.5) { pathOptions = { fillColor: 'green', color: 'green' } }
+                        else if (cap < 0.8) { pathOptions = { fillColor: 'red', color: 'red' } }
+                        else if (cap < 1.1) { pathOptions = { fillColor: 'black', color: 'black' } }
                         
                         return (
                             <div key={locationId+"-"+s["zone"]} >
@@ -191,8 +212,9 @@ function MapApp() {
                                 >
                                     <Popup>
                                         {s["last_detected_cars"]} cars parked by {s["time"]} <br />
-                                        {s["max_detected_cars"]} max (for period of {s["time"]}) <br />
-                                        {(100*cap).toLocaleString(undefined, {maximumFractionDigits:0})+'%'} full
+                                        {s["max_detected_cars"]} max (for period of {s["period_for_max"]}) <br />
+                                        {(100*cap).toLocaleString(undefined, {maximumFractionDigits:0})+'%'} filled <br />
+                                        <Link to={"/cam/"+s["location"]+"/"+s["camera"]+"/"+s["zone"]}>view</Link>
                                     </Popup>
                                     {/*
                                        <Tooltip direction="bottom"
@@ -220,7 +242,7 @@ function MapApp() {
     
     return (
         <MapContainer
-            center={startLocation.pos}
+            center={state.pos || [52.371809, 5.188753]}
             zoom={18}
             scrollWheelZoom={false}
         >
@@ -234,4 +256,4 @@ function MapApp() {
     );
 }
 
-export default MapApp;
+export default MapView;
