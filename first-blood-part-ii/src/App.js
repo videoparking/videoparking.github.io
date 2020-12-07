@@ -1,6 +1,6 @@
 import React  from 'react';
 import './App.css';
-import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
+import { HashRouter, Link, Route, Switch } from 'react-router-dom';
 import MapView from './MapView';
 import CamView from './CamView';
 
@@ -16,7 +16,7 @@ function App() {
     return (
         <div>
             <h1>VideoParking</h1>
-            <BrowserRouter>
+            <HashRouter>
                 <nav>
                     <ul>
                         <li><Link to="/map/52.371809,5.188753">Map</Link></li>
@@ -38,7 +38,7 @@ function App() {
                         <MapView />
                     </Route>
                 </Switch>
-            </BrowserRouter>
+            </HashRouter>
         </div>
     );
 }
