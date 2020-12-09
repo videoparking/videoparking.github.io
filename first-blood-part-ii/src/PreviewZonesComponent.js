@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {Shape, Group, Text} from 'react-konva';
+import {Shape, Group, Text, Line} from 'react-konva';
 import API from './zonesApi';
 
-const trace = console.log;
 
 async function getZonesData(location) {
     if (location) {
@@ -43,7 +42,7 @@ const PreviewZonesComponent = (props) => {
     
     const loadZones = () => {
         getZonesData(props.location).then(data => {
-            trace(data);
+            console.log(data);
             setState({
                 zones: data.zones,
                 stats: norm(props.stats),
@@ -55,27 +54,12 @@ const PreviewZonesComponent = (props) => {
             });
         });
     };
-    
-    const drawPolygon = (zone) => {
-        const scaled = (e) =>  e * props.scale;
-        function func(ctx) {
-            if (zone) {
-                const p = zone.polygon;
-                ctx.beginPath();
-                ctx.moveTo(scaled(p[0][0]), scaled(p[0][1]));
-                for (var i = 1; i < p.length; i++) {
-                    ctx.lineTo(scaled(p[i][0]), scaled(p[i][1]));
-                }
-                ctx.closePath();
-                // Konva specific method
-                ctx.fillStrokeShape(this);
-            } else {
-                console.log("no zones to preview");
-            }
-        }
-        return func;
-    };
 
+    const polygon = (zone) => {
+        const scaled = (e) =>  e * props.scale;
+        return zone.polygon.map(([x,y]) => [scaled(x), scaled(y)]).flat();
+    }
+    
     const info = (name) => {
         if (state.stats) {
             const stats = state.stats[name];
@@ -101,10 +85,11 @@ const PreviewZonesComponent = (props) => {
                     fontSize={10}
                     fill={props.color}
                 />
-                <Shape
+                <Line
+                    points={polygon(zone)}
                     stroke={props.color}
                     strokeWidth={1}
-                    sceneFunc={drawPolygon(zone)}
+                    closed={true}
                 />
             </Group>
         )
