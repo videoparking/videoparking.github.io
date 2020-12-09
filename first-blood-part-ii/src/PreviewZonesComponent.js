@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {Shape, Group, Text} from 'react-konva';
 import API from './zonesApi';
 
@@ -22,43 +22,42 @@ function norm(stats) {
     return s;
 }
 
-class PreviewZonesComponent extends React.Component {
-    state = {
+const PreviewZonesComponent = (props) => {
+    const [state, setState] = useState({
         zones: [],
-        stats: norm(this.props.stats),
-    };
-    componentDidMount() {
-        this.loadZones();
-    }
-    componentDidUpdate(oldProps) {
-        if (oldProps.location !== this.props.location) {
-            this.loadZones();
-        } else if (oldProps.stats !== this.props.stats) {
-            this.setState({
-                ...this.state,
-                stats: norm(this.props.stats),
-            });
-        }
-    }
-    componentWillUnmount() {
-        ///
-    }
-    loadZones() {
-        getZonesData(this.props.location).then(data => {
+        stats: norm(props.stats),
+    });
+
+    const isDrawing = React.useRef(false);
+
+    useEffect(() => {
+        loadZones();
+    }, [props.location]);
+
+    useEffect(() => {
+        setState({
+            ...state,
+            stats: norm(props.stats),
+        });
+    }, [props.stats]);
+    
+    const loadZones = () => {
+        getZonesData(props.location).then(data => {
             trace(data);
-            this.setState({
+            setState({
                 zones: data.zones,
-                stats: norm(this.props.stats),
+                stats: norm(props.stats),
             });
         }).catch(err => {
             console.log("ERROR:",err);
-            this.setState({
+            setState({
                 zones: [],
             });
         });
-    }
-    drawPolygon(zone) {
-        const scaled = (e) =>  e * this.props.scale;
+    };
+    
+    const drawPolygon = (zone) => {
+        const scaled = (e) =>  e * props.scale;
         function func(ctx) {
             if (zone) {
                 const p = zone.polygon;
@@ -75,41 +74,41 @@ class PreviewZonesComponent extends React.Component {
             }
         }
         return func;
-    }
-    info(name) {
-        if (this.state.stats) {
-            const stats = this.state.stats[name];
+    };
+
+    const info = (name) => {
+        if (state.stats) {
+            const stats = state.stats[name];
             if (stats) {
                 return `${name} ${stats.last_detected_cars}/${stats.max_detected_cars}`;
             } else {
                 return name;
             }
         }
-    }
-    render() {
-        return (
-            this.state.zones.map((zone) =>
-                <Group
-                    key={zone.name}
-                    x={0}
-                    y={0}
-                >
-                    <Text
-                        text={this.info(zone.name)}
-                        x={3 + zone.polygon[0][0] * this.props.scale}
-                        y={zone.polygon[0][1] * this.props.scale}
-                        fontSize={10}
-                        fill={this.props.color}
-                    />
-                    <Shape
-                        stroke={this.props.color}
-                        strokeWidth={1}
-                        sceneFunc={this.drawPolygon(zone)}
-                    />
-                </Group>
-            )
-        );
-    }
+    };
+    
+    return (
+        state.zones.map((zone) =>
+            <Group
+                key={zone.name}
+                x={0}
+                y={0}
+            >
+                <Text
+                    text={info(zone.name)}
+                    x={3 + zone.polygon[0][0] * props.scale}
+                    y={zone.polygon[0][1] * props.scale}
+                    fontSize={10}
+                    fill={props.color}
+                />
+                <Shape
+                    stroke={props.color}
+                    strokeWidth={1}
+                    sceneFunc={drawPolygon(zone)}
+                />
+            </Group>
+        )
+    );
 }
 
 
