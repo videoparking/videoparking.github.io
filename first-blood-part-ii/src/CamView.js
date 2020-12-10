@@ -230,6 +230,7 @@ function CamView() {
                             stats={state.stats}
                             scale={state.scale}
                             color="magenta"
+                            modifiedColor="red"
                         />
                     </Layer>
                     <Layer>
@@ -259,12 +260,18 @@ function CamView() {
                         </Group>
                         <Group
                             x={state.vw - 180}
-                            y={state.vh - 30}
+                            y={state.vh - 100}
                         >
                             <Text
                                 text={`Config:
   screen: ${state.vw}x${state.vh}
   scale: ${state.scale}
+
+Keys:
+  'e': export zones
+
+Help:
+  - Move zone edge points with mouse
 `}
                                 fontSize={10}
                                 fill={"black"}

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {Shape, Group, Text, Line} from 'react-konva';
+import Konva from 'konva';
+import {Shape, Group, Text, Line, Circle} from 'react-konva';
+import KeyboardEventHandler from 'react-keyboard-event-handler';
 import API from './zonesApi';
 
 
@@ -27,8 +29,6 @@ const PreviewZonesComponent = (props) => {
         stats: norm(props.stats),
     });
 
-    const isDrawing = React.useRef(false);
-
     useEffect(() => {
         loadZones();
     }, [props.location]);
@@ -55,8 +55,10 @@ const PreviewZonesComponent = (props) => {
         });
     };
 
+    const scaled = (e) => e * props.scale;
+    const descaled = (e) => e / props.scale;
+
     const polygon = (zone) => {
-        const scaled = (e) =>  e * props.scale;
         return zone.polygon.map(([x,y]) => [scaled(x), scaled(y)]).flat();
     }
     
@@ -70,6 +72,86 @@ const PreviewZonesComponent = (props) => {
             }
         }
     };
+
+    const ppoints = (zone) => {
+        const p = zone.polygon;
+        var px = [];
+        for (var i = 0; i < p.length; i++) {
+            const [x,y] = p[i];
+            px[i] = {x:x,y:y,i:i};
+        }
+        console.log("ppoints:", px);
+        return px;
+    }
+
+    const update_zones = (zone_name, pi, x, y) => {
+        var zones = []
+        for (var i = 0; i < state.zones.length; i++) {
+            const zone = state.zones[i];
+            if (zone.name === zone_name) {
+                zone.polygon[pi] = [x,y];
+                zone.modified = true;
+            }
+            zones[i] = zone;
+        }
+        return zones;
+    }
+
+    const setEventKey = (key) => {
+        console.log("key:", key);
+        if (key === "e") {
+            downloadFile(`${props.location}/zones-v1.json`, JSON.stringify(state.zones));
+        }
+    }
+
+    /**
+     * See https://github.com/axetroy/react-download/blob/master/src/react-download.jsx
+     */
+    const downloadFile = (fileName, fileContent) => {
+        function fake_click(obj) {
+            let ev = document.createEvent("MouseEvents");
+            ev.initMouseEvent(
+                "click",
+                true,
+                false,
+                window,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false,
+                false,
+                false,
+                false,
+                0,
+                null
+            );
+            obj.dispatchEvent(ev);
+        }
+        function export_raw(name, data) {
+            let urlObject = window.URL || window.webkitURL || window;
+            let export_blob = new Blob([data]);
+
+            if ('msSaveBlob' in navigator) {
+                // Prefer msSaveBlob if available - Edge supports a[download] but
+                // ignores the filename provided, using the blob UUID instead.
+                // msSaveBlob will respect the provided filename
+                navigator.msSaveBlob(export_blob, name);
+            } else if ('download' in HTMLAnchorElement.prototype) {
+                let save_link = document.createElementNS(
+                    "http://www.w3.org/1999/xhtml",
+                    "a"
+                );
+                save_link.href = urlObject.createObjectURL(export_blob);
+                save_link.download = name;
+                fake_click(save_link);
+            } else {
+                throw new Error("Neither a[download] nor msSaveBlob is available");
+            }
+        }
+        export_raw(fileName, fileContent);
+    }
     
     return (
         state.zones.map((zone) =>
@@ -87,10 +169,35 @@ const PreviewZonesComponent = (props) => {
                 />
                 <Line
                     points={polygon(zone)}
-                    stroke={props.color}
+                    stroke={zone.modified ? props.modifiedColor : props.color}
                     strokeWidth={1}
                     closed={true}
                 />
+                {ppoints(zone).map(({x,y,i}) =>
+                    <Circle
+                        key={zone.name + "-p-" + i}
+                        x={scaled(x)}
+                        y={scaled(y)}
+                        radius={5}
+                        fill={zone.modified ? props.modifiedColor : props.color}
+                        draggable
+                        onDragStart={() => {
+                            setState({
+                                ...state,
+                                isDragging: true
+                            });
+                        }}
+                        onDragEnd={e => {
+                            console.log(">>>>", e);
+                            setState({
+                                ...state,
+                                isDragging: false,
+                                zones: update_zones(zone.name, i, descaled(e.target.x()), descaled(e.target.y())),
+                            });
+                        }}
+                    />
+                )}
+                <KeyboardEventHandler handleKeys={['e']} onKeyEvent={(key, e) => setEventKey(key)}/>
             </Group>
         )
     );
