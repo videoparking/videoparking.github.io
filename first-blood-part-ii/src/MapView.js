@@ -55,44 +55,44 @@ async function getStats(location) {
     console.log("response:", response);
     return response.data;
 
-    return new Promise( (resolutionFunc,rejectionFunc) => {
-	resolutionFunc({
-            "frameTime": "2020-11-29T23:56:20.437Z",
-            "expiresAt": "2020-11-30T00:06:20.437Z",
-            "duration": 60,
-            "renewAfter": "2020-11-30T00:02:20.437Z",
-            "message": "You are ace",
-            "stats": [
-                {
-                    "location": "8f38301f7f70d7d1",
-                    "camera": "1",
-                    "zone": "_unknown",
-                    "time": "2020-11-27 14:20:00.000000000",
-                    "last_detected_cars": "0",
-                    "period_for_max": "3 15:27:00.000000000",
-                    "max_detected_cars": "9"
-                },
-                {
-                    "location": "8f38301f7f70d7d1",
-                    "camera": "1",
-                    "zone": "a",
-                    "time": "2020-11-29 23:56:00.000000000",
-                    "last_detected_cars": "8",
-                    "period_for_max": "6 23:53:00.000000000",
-                    "max_detected_cars": "11"
-                },
-                {
-                    "location": "8f38301f7f70d7d1",
-                    "camera": "1",
-                    "zone": "b",
-                    "time": "2020-11-29 23:56:00.000000000",
-                    "last_detected_cars": "1",
-                    "period_for_max": "6 23:53:00.000000000",
-                    "max_detected_cars": "3"
-                }
-            ]
-	});
-    });
+    // return new Promise( (resolutionFunc,rejectionFunc) => {
+    //     resolutionFunc({
+    //         "frameTime": "2020-11-29T23:56:20.437Z",
+    //         "expiresAt": "2020-11-30T00:06:20.437Z",
+    //         "duration": 60,
+    //         "renewAfter": "2020-11-30T00:02:20.437Z",
+    //         "message": "You are ace",
+    //         "stats": [
+    //             {
+    //                 "location": "8f38301f7f70d7d1",
+    //                 "camera": "1",
+    //                 "zone": "_unknown",
+    //                 "time": "2020-11-27 14:20:00.000000000",
+    //                 "last_detected_cars": "0",
+    //                 "period_for_max": "3 15:27:00.000000000",
+    //                 "max_detected_cars": "9"
+    //             },
+    //             {
+    //                 "location": "8f38301f7f70d7d1",
+    //                 "camera": "1",
+    //                 "zone": "a",
+    //                 "time": "2020-11-29 23:56:00.000000000",
+    //                 "last_detected_cars": "8",
+    //                 "period_for_max": "6 23:53:00.000000000",
+    //                 "max_detected_cars": "11"
+    //             },
+    //             {
+    //                 "location": "8f38301f7f70d7d1",
+    //                 "camera": "1",
+    //                 "zone": "b",
+    //                 "time": "2020-11-29 23:56:00.000000000",
+    //                 "last_detected_cars": "1",
+    //                 "period_for_max": "6 23:53:00.000000000",
+    //                 "max_detected_cars": "3"
+    //             }
+    //         ]
+    //     });
+    // });
 }
 
 
@@ -243,12 +243,15 @@ function MapView() {
     return (
         <MapContainer
             center={state.pos || [52.371809, 5.188753]}
-            zoom={18}
+            zoom={19}
             scrollWheelZoom={false}
+            maxZoom={20}
         >
             <TileLayer
-                attribution='<a href="http://videoparking.live/copyright">VideoParking.live</a> | &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url="https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={accessToken}"
+                attribution='<a href="http://videoparking.live/copyright">VideoParking.live</a> | Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
+                accessToken="pk.eyJ1IjoidmlkZW9wYXJraW5nIiwiYSI6ImNraTZqa2QycTBmY2EzMG1xZ2R4eGpqaGMifQ.LG9VLK74nBfMJsoxpLQhxg"
+                maxZoom={20}
             />
             {/*<LocationMarker />*/}
             {Zones(state.stats)}
