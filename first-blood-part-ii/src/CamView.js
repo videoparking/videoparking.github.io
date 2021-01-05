@@ -231,6 +231,7 @@ function CamView() {
                             scale={state.scale}
                             color="magenta"
                             modifiedColor="red"
+                            baseResolution={[state.iw, state.ih]}
                         />
                     </Layer>
                     <Layer>
@@ -269,6 +270,7 @@ function CamView() {
 
 Keys:
   'e': export zones
+  'a': add new zone
 
 Help:
   - Move zone edge points with mouse

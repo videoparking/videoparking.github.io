@@ -97,10 +97,45 @@ const PreviewZonesComponent = (props) => {
         return zones;
     }
 
+    const pickNewName = (names) => {
+        return String.fromCharCode('a'.charCodeAt(0) + names.length);
+    };
+
+    const addNewZone = () => {
+        let [x,y,h,w] = [100,100,500,500];
+        let newName = pickNewName(state.zones.map(zone => zone.name));
+        let newZone = {
+            name: newName,
+            polygon: [
+                [x, y],
+                [x+w, y],
+                [x+w, y+h],
+                [x, y+h],
+            ]
+        };
+        console.log('Adding new zone', newName);
+        setState({
+            ...state,
+            zones: [...state.zones, newZone],
+        });
+    };
+    
     const setEventKey = (key) => {
         console.log("key:", key);
         if (key === "e") {
-            downloadFile(`${props.location}/zones-v1.json`, JSON.stringify(state.zones));
+            downloadFile(
+                `${props.location}/zones-v1.json`,
+                JSON.stringify(
+                    {
+                        "base_resolution": props.baseResolution,
+                        "zones": state.zones
+                    },
+                    null,
+                    2
+                )
+            );
+        } else if (key === 'a') {
+            addNewZone();
         }
     }
 
@@ -153,7 +188,7 @@ const PreviewZonesComponent = (props) => {
         export_raw(fileName, fileContent);
     }
     
-    return (
+    const ren = () => (
         state.zones.map((zone) =>
             <Group
                 key={zone.name}
@@ -197,9 +232,15 @@ const PreviewZonesComponent = (props) => {
                         }}
                     />
                 )}
-                <KeyboardEventHandler handleKeys={['e']} onKeyEvent={(key, e) => setEventKey(key)}/>
             </Group>
-        )
+            )
+    );
+
+    return (
+        <Group>
+            {ren()}
+            <KeyboardEventHandler handleKeys={['e', 'a']} onKeyEvent={(key, e) => setEventKey(key)}/>
+        </Group>
     );
 }
 
