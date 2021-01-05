@@ -261,7 +261,7 @@ function CamView() {
                         </Group>
                         <Group
                             x={state.vw - 180}
-                            y={state.vh - 100}
+                            y={state.vh - 120}
                         >
                             <Text
                                 text={`Config:
@@ -273,7 +273,8 @@ Keys:
   'a': add new zone
 
 Help:
-  - Move zone edge points with mouse
+  - Move zone edge points with mouse.
+    Use shift to clone edges.
 `}
                                 fontSize={10}
                                 fill={"black"}

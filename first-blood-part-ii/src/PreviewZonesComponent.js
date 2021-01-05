@@ -97,6 +97,19 @@ const PreviewZonesComponent = (props) => {
         return zones;
     }
 
+    const clone_zone_edge = (zone_name, pi) => {
+        var zones = []
+        for (var i = 0; i < state.zones.length; i++) {
+            const zone = state.zones[i];
+            if (zone.name === zone_name) {
+                zone.polygon.splice(pi, 0, zone.polygon[pi]);
+                zone.modified = true;
+            }
+            zones[i] = zone;
+        }
+        return zones;
+    }
+
     const pickNewName = (names) => {
         return String.fromCharCode('a'.charCodeAt(0) + names.length);
     };
@@ -111,7 +124,8 @@ const PreviewZonesComponent = (props) => {
                 [x+w, y],
                 [x+w, y+h],
                 [x, y+h],
-            ]
+            ],
+            modified: true
         };
         console.log('Adding new zone', newName);
         setState({
@@ -122,7 +136,7 @@ const PreviewZonesComponent = (props) => {
     
     const setEventKey = (key) => {
         console.log("key:", key);
-        if (key === "e") {
+        if (key === 'e') {
             downloadFile(
                 `${props.location}/zones-v1.json`,
                 JSON.stringify(
@@ -137,7 +151,7 @@ const PreviewZonesComponent = (props) => {
         } else if (key === 'a') {
             addNewZone();
         }
-    }
+    };
 
     /**
      * See https://github.com/axetroy/react-download/blob/master/src/react-download.jsx
@@ -216,11 +230,24 @@ const PreviewZonesComponent = (props) => {
                         radius={5}
                         fill={zone.modified ? props.modifiedColor : props.color}
                         draggable
-                        onDragStart={() => {
+                        onDragStart={e => {
+                            console.log(">>", e);
+                            let newZones = e.evt.shiftKey ? { zones: clone_zone_edge(zone.name, i) } : {};
                             setState({
                                 ...state,
-                                isDragging: true
+                                isDragging: true,
+                                ...newZones
                             });
+                        }}
+                        onDragMove={e => {
+                            if (e.evt.movementX != 0 || e.evt.movementY != 0) {
+                                console.log(">>>", e);
+                                setState({
+                                    ...state,
+                                    isDragging: true,
+                                    zones: update_zones(zone.name, i, descaled(e.target.x()), descaled(e.target.y())),
+                                });
+                            }
                         }}
                         onDragEnd={e => {
                             console.log(">>>>", e);
