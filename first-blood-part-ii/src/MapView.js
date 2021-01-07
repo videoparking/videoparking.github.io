@@ -42,8 +42,45 @@ const locations = {
                 ]
             }
         }
-    }, // 52.371809, 5.188753 -- 52*22'18.5"N 5*11'19.5"E
-    //"a07345b2737af5f/1": {},
+    },
+    "e92114fcbfd5688/1": {
+        pos: [59.9373297, 30.4832178],
+        zones: {
+            "a2": {
+                polygon: [
+                    [59.937344, 30.483425],
+                    [59.937375, 30.482893],
+                    [59.937523, 30.483001],
+                    [59.937492, 30.483343]
+                ]
+            },
+            "b2": {
+                polygon: [
+                    [59.937120, 30.483006],
+                    [59.937160, 30.482604],
+                    [59.937375, 30.482893],
+                    [59.937250, 30.483076]
+                ]
+            },
+            "c2": {
+                polygon: [
+                    [59.937492, 30.483343],
+                    [59.937523, 30.483001],
+                    [59.937571, 30.483087],
+                    [59.937559, 30.483296]
+                ]
+            },
+            "d2": {
+                polygon: [
+                    [59.937101, 30.483478],
+                    [59.937120, 30.483006],
+                    [59.937250, 30.483076],
+                    [59.937344, 30.483425],
+                    [59.937135, 30.483499]
+                ]
+            },
+        }
+    }
 }
 
 async function getStats(location) {
@@ -54,45 +91,6 @@ async function getStats(location) {
     const response = await API.get(`view?location=${location}`);
     console.log("response:", response);
     return response.data;
-
-    // return new Promise( (resolutionFunc,rejectionFunc) => {
-    //     resolutionFunc({
-    //         "frameTime": "2020-11-29T23:56:20.437Z",
-    //         "expiresAt": "2020-11-30T00:06:20.437Z",
-    //         "duration": 60,
-    //         "renewAfter": "2020-11-30T00:02:20.437Z",
-    //         "message": "You are ace",
-    //         "stats": [
-    //             {
-    //                 "location": "8f38301f7f70d7d1",
-    //                 "camera": "1",
-    //                 "zone": "_unknown",
-    //                 "time": "2020-11-27 14:20:00.000000000",
-    //                 "last_detected_cars": "0",
-    //                 "period_for_max": "3 15:27:00.000000000",
-    //                 "max_detected_cars": "9"
-    //             },
-    //             {
-    //                 "location": "8f38301f7f70d7d1",
-    //                 "camera": "1",
-    //                 "zone": "a",
-    //                 "time": "2020-11-29 23:56:00.000000000",
-    //                 "last_detected_cars": "8",
-    //                 "period_for_max": "6 23:53:00.000000000",
-    //                 "max_detected_cars": "11"
-    //             },
-    //             {
-    //                 "location": "8f38301f7f70d7d1",
-    //                 "camera": "1",
-    //                 "zone": "b",
-    //                 "time": "2020-11-29 23:56:00.000000000",
-    //                 "last_detected_cars": "1",
-    //                 "period_for_max": "6 23:53:00.000000000",
-    //                 "max_detected_cars": "3"
-    //             }
-    //         ]
-    //     });
-    // });
 }
 
 
@@ -101,7 +99,8 @@ function MapView() {
     const [state, setState] = useState({
         stats: [],
 	first: true,
-        location: "8f38301f7f70d7d1/1", // TODO: Add location(s) detection for visible area at lat lon
+        location: "e92114fcbfd5688/1"
+        // location: "8f38301f7f70d7d1/1", // TODO: Add location(s) detection for visible area at lat lon
     });
 
     const { latLng } = useParams();
@@ -131,7 +130,7 @@ function MapView() {
 	        };
                 console.log(newS);
 	        setState(newS);
-	        document.title = data.message + `, parking at ${state.location} ${new Date(frameTime)}`;
+	        document.title = data.message + `, parking at ${locations[state.location].pos}`;
             }
 	}).catch(err => {
             console.log(err);
@@ -158,8 +157,6 @@ function MapView() {
             clearTimeout(timer);
         };
     });
-
-    const startLocation = locations["8f38301f7f70d7d1/1"];
 
     /*
     function LocationMarker() {
@@ -205,7 +202,7 @@ function MapView() {
                         
                         return (
                             <div key={locationId+"-"+s["zone"]} >
-                                <Marker position={markerPos} />
+                                {/*<Marker position={markerPos} />*/}
                                 <Polygon
                                     pathOptions={pathOptions}
                                     positions={zone.polygon}
