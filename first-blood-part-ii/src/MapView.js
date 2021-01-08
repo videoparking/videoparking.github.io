@@ -209,6 +209,9 @@ function MapView() {
                         if (cap < 0.5) { pathOptions = { fillColor: 'green', color: 'green' } }
                         else if (cap < 0.8) { pathOptions = { fillColor: 'red', color: 'red' } }
                         else if (cap < 1.1) { pathOptions = { fillColor: 'black', color: 'black' } }
+
+                        const lastDetectedTime = new Date(s["time"].replace(' ', 'T')+"Z");
+                        const maxDetectedPeriodStr = s["period_for_max"].replace(/\:[^:]+$/, '').replace(' ', ' days ');
                         
                         return (
                             <div key={locationId+"-"+s["zone"]} >
@@ -218,10 +221,10 @@ function MapView() {
                                     positions={zone.polygon}
                                 >
                                     <Popup>
-                                        {s["last_detected_cars"]} cars parked by {s["time"]} <br />
-                                        {s["max_detected_cars"]} max (for period of {s["period_for_max"]}) <br />
-                                        {(100*cap).toLocaleString(undefined, {maximumFractionDigits:0})+'%'} filled <br />
-                                        <Link to={"/cam/"+s["location"]+"/"+s["camera"]+"/"+s["zone"]}>view</Link>
+                                        <h1>{(100*cap).toLocaleString(undefined, {maximumFractionDigits:0})+'%'} full</h1>
+                                        <strong>{s["max_detected_cars"]} max</strong> over {maxDetectedPeriodStr} <br />
+                                        <strong>{s["last_detected_cars"]} cars parked</strong> at {lastDetectedTime.toLocaleString()} <br />
+                                        {/*<Link to={"/cam/"+s["location"]+"/"+s["camera"]+"/"+s["zone"]}>view</Link>*/}
                                     </Popup>
                                     {/*
                                        <Tooltip direction="bottom"
