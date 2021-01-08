@@ -3,7 +3,7 @@ import React, { useState, useEffect }  from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './MapView.css';
 import API from './api';
-import { MapContainer, TileLayer, Polygon, Tooltip, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, /*Tooltip, Marker,*/ Popup, /*useMapEvents*/ } from 'react-leaflet';
 
 // see https://github.com/Leaflet/Leaflet/issues/4968
 import L from 'leaflet';
@@ -83,6 +83,15 @@ const locations = {
     }
 }
 
+function knownLocation([lat, lon]) {
+    for (let lid of Object.keys(locations)) {
+        let [llat, llon] = locations[lid].pos;
+        if (llat-0.0001 < lat && lat < llat+0.0001 &&
+            llon-0.0001 < lon && lon < llon+0.0001)
+            return lid;
+    }
+}
+
 async function getStats(location) {
     if (!location) {
         return;
@@ -98,9 +107,7 @@ function MapView() {
 
     const [state, setState] = useState({
         stats: [],
-	first: true,
-        location: "e92114fcbfd5688/1"
-        // location: "8f38301f7f70d7d1/1", // TODO: Add location(s) detection for visible area at lat lon
+	first: true
     });
 
     const { latLng } = useParams();
@@ -108,10 +115,13 @@ function MapView() {
     if (latLng && latLng !== state.latLng) {
         const pos = latLng.split(",").map(parseFloat);
         console.log("pos:", pos);
+        let lid = knownLocation(pos)
+        let location = lid ? {location: lid} : {}
         setState({
             ...state,
             latLng: latLng,
             pos: pos,
+            ...location
         });
     }
 
@@ -239,7 +249,7 @@ function MapView() {
     
     return (
         <MapContainer
-            center={state.pos || [52.371809, 5.188753]}
+            center={state.pos}
             zoom={19}
             scrollWheelZoom={false}
             maxZoom={20}

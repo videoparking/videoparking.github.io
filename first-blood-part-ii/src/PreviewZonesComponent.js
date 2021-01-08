@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Konva from 'konva';
-import {Shape, Group, Text, Line, Circle} from 'react-konva';
+import {Group, Text, Line, Circle} from 'react-konva';
 import KeyboardEventHandler from 'react-keyboard-event-handler';
 import API from './zonesApi';
 
@@ -29,15 +28,15 @@ const PreviewZonesComponent = (props) => {
         stats: norm(props.stats),
     });
 
-    useEffect(() => {
-        loadZones();
-    }, [props.location]);
-
-    useEffect(() => {
+    const normStats = () => {
         setState({
             ...state,
             stats: norm(props.stats),
         });
+    }
+
+    useEffect(() => {
+        normStats();
     }, [props.stats]);
     
     const loadZones = () => {
@@ -54,6 +53,10 @@ const PreviewZonesComponent = (props) => {
             });
         });
     };
+    
+    useEffect(() => {
+        loadZones();
+    }, [props.location]);
 
     const scaled = (e) => e * props.scale;
     const descaled = (e) => e / props.scale;
@@ -240,7 +243,7 @@ const PreviewZonesComponent = (props) => {
                             });
                         }}
                         onDragMove={e => {
-                            if (e.evt.movementX != 0 || e.evt.movementY != 0) {
+                            if (e.evt.movementX !== 0 || e.evt.movementY !== 0) {
                                 console.log(">>>", e);
                                 setState({
                                     ...state,
